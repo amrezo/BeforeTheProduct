@@ -1,0 +1,135 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<div class="row">
+  <div class="col-lg-9">
+    <div class="card shadow-sm mb-3">
+      <img src="{{ main_image }}" class="card-img-top" alt="main image">
+      <div class="card-header">
+        <div class="row">
+          <div class="col-lg-2">
+            <img class="rounded-circle mb-3" src="{{ thumbnail_image }}" width="100" height="100">
+          </div>
+          <div class="col-lg-10">
+            <h1 class="card-title">{{ idea.title }}</h1>
+            <p class="card-text"><a href="{{ idea.link }}" class="btn btn-primary rounded-pill" target="_blank"><i class="mr-2" data-feather="link" width=17></i> {{ idea.link }}</a></p>
+            <p class="card-text"><small class="text-muted">Last updated on {{ idea.date_posted.strftime('%b %d, %Y') }}</small></p>
+          </div>
+        </div>
+      </div>
+      <div class="card-body">
+        <p>{{ idea.description | safe }}</p>
+      </div>
+      <div class="card-footer text-center">
+        <div class="mt-4">
+          <a href="#" class="btn btn-outline-secondary rounded-pill mr-2 mb-2"><i class="mr-2" data-feather="eye" width=17></i>{{ idea.view_count }} Views</a>
+          {% if current_user.has_yessed_idea(idea) %}
+            <a href="{{ url_for('yes_action', idea_id=idea.id, action='unyes') }}" class="btn btn-success rounded-pill mr-2 mb-2">{{ idea.yesses.count() }}<i class="ml-1 mr-2" data-feather="thumbs-up" width=17></i>Yay!</a>
+          {% else %}
+          <a href="{{ url_for('yes_action', idea_id=idea.id, action='yes') }}" class="btn btn-outline-success rounded-pill mr-2 mb-2">{{ idea.yesses.count() }}<i class="ml-1 mr-2" data-feather="thumbs-up" width=17></i>Yay!</a>
+          {% endif %}
+          {% if current_user.has_noed_idea(idea) %}
+            <a href="{{ url_for('no_action', idea_id=idea.id, action='unno') }}" class="btn btn-danger rounded-pill mr-2 mb-2">{{ idea.noes.count() }}<i class="ml-1 mr-2" data-feather="thumbs-down" width=17></i>Nope!</a>
+          {% else %}
+          <a href="{{ url_for('no_action', idea_id=idea.id, action='no') }}" class="btn btn-outline-danger rounded-pill mr-2 mb-2">{{ idea.noes.count() }}<i class="ml-1 mr-2" data-feather="thumbs-down" width=17></i>Nope!</a>
+          {% endif %}
+            <a href="#comments" class="btn btn-outline-warning rounded-pill mr-2 mb-2"><i class="mr-2" data-feather="message-square" width=17></i>{{ idea.comments.count() }} Comments</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-3">
+    <div class="mb-3">
+      {% if current_user.has_upvoted(idea) %}
+        <a href="{{ url_for('upvote', idea_id=idea.id, action='unupvote') }}" class="btn btn-lg btn-primary mr-2 mb-2 btn-block">{{ idea.upvotes.count() }}<i class="ml-1 mr-2" data-feather="arrow-up-circle" width=17></i>Upvoted</a>
+      {% else %}
+      <a href="{{ url_for('upvote', idea_id=idea.id, action='upvote') }}" class="btn btn-lg btn-outline-primary mr-2 mb-2 btn-block">{{ idea.upvotes.count() }}<i class="ml-1 mr-2" data-feather="arrow-up-circle" width=17></i>Upvote</a>
+      {% endif %}
+    </div>
+    <div class="card shadow-sm mb-3">
+      <div class="card-header">
+        <p class="text-muted">ADDED BY</p>
+        <img class="rounded-circle mb-3" src="{{ url_for('static', filename='profile_pics/' + idea.user.image_file) }}" width="50">
+        <h6><span class="text-muted">by</span> {{ idea.user.full_name }}</h6>
+        {% if idea.user.headline %}
+        <p class="text-muted">{{ idea.user.headline }}</p>
+        {% endif %}
+        {% if idea.user == current_user %}
+          <div>
+            <a class="btn btn-info btn-sm mt-1 mb-1 rounded-pill" href="{{ url_for('update_idea', idea_id=idea.id) }}"><i class="mr-1" data-feather="edit" width=17></i>Edit</a>
+            <button type="button" class="btn btn-danger btn-sm m-1 rounded-pill" data-toggle="modal" data-target="#deleteModal"><i class="mr-1" data-feather="trash" width=17></i>Delete</button>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+    <div class="card shadow-sm mb-3">
+      <div class="card-header">
+        <p class="text-muted">TOPIC</p>
+        <button type="button" class="btn btn-warning btn-sm m-1 rounded-pill"><i class="mr-1" data-feather="list" width=17></i>{{ idea.topic.upper() }}</button>
+      </div>
+    </div>
+    <div class="card shadow-sm">
+      <div class="card-header">
+        <p class="text-muted">SIMILAR IDEAS</p>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+  <!-- Modal -->
+  <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="deleteModalLabel">Delete Post?</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-info rounded-pill" data-dismiss="modal">Close</button>
+          <form action="{{ url_for('delete_idea', idea_id=idea.id, company_id=company_id) }}" method="POST">
+            <input class="btn btn-danger rounded-pill" type="submit" value="Delete">
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock content %}
+
+{% block debate %}
+<div class="jumbotron jumbotron-fluid">
+  <div class="container">
+      <h3 id="comments">Comments</h3>
+      <div class="card">
+        <div class="card-body">
+          <h6 class="card-title d-flex justify-content-center">Add a Comment</h6>
+          <p class="card-text d-flex justify-content-center">Let the poster know what you think of their idea.</p>
+          <div class="text-center">
+            <a href="{{ url_for('new_comment', idea_id=idea.id) }}" class="btn btn-secondary rounded-pill mr-2"><i class="mr-2" data-feather="message-square" width=17></i>Add a Comment</a>
+          </div>
+        </div>
+      </div>
+      {% if idea.comments.count() == 1 %}
+      <h4 class="mt-4" style="color: #ff9d00;">{{ idea.comments.count() }} Comment</h4>
+      {% elif idea.comments.count() > 1 %}
+      <h4 class="mt-4" style="color: #ff9d00;">{{ idea.comments.count() }} Comments</h4>
+      {% endif %}
+      {% for comment in idea.comments %}
+      <div class="card mt-2 shadow-sm">
+        <div class="card-body">
+          <span style="color: #ff9d00;"><i class="mr-2" data-feather="message-square" width=20 style="color: #ff9d00;"></i><strong>Comment</strong></span>
+              <h4 class="card-title">{{ comment.content | safe }}</h4>
+              <p class="card-text">
+                <img class="rounded-circle mr-1" src="{{ url_for('static', filename='profile_pics/' + comment.user.image_file) }}" width="25">
+                  {{ comment.user.full_name }}
+                <small class="text-muted">· {{ comment.date_posted.strftime('%b %d') }}</small>
+                <a href="{{ url_for('delete_comment', comment_id=comment.id) }}" class="btn btn-link">Delete</a>
+              </p>
+        </div>
+      </div>
+      {% endfor %}
+  </div>
+</div>
+{% endblock debate %}

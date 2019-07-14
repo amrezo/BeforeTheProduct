@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Favicon -->
+    <link rel="shortcut icon" type="image/x-icon" href="{{ url_for('static', filename='assets/img/favicon.png') }}">
+
+    <title>BeforeTheProduct | Validate, Share and Gather Feedback for Your Startup Ideas</title>
+
+    <!-- vendor css -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='lib/@fortawesome/fontawesome-free/css/all.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='lib/ionicons/css/ionicons.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='lib/jqvmap/jqvmap.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='lib/bootstrap-tagsinput/bootstrap-tagsinput.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='lib/bootstrap-tagsinput/bootstrap-tagsinput-typeahead.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='lib/select2/css/select2.min.css') }}">
+
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='lib/quill/quill.core.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='lib/quill/quill.snow.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='lib/quill/quill.bubble.css') }}">
+
+    <!-- DashForge CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/dashforge.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/dashforge.dashboard.css') }}">
+
+    <!-- PaceJS - Loading Indicator -->
+    <script src="{{ url_for('static', filename='pace/pace.min.js') }}"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='pace/pace.css') }}">
+  </head>
+  <body class="page-profile">
+
+        <header class="navbar navbar-header navbar-header-fixed">
+          <a class="navbar-brand" href="{{ url_for('home') }}">
+            <img src="{{ url_for('static', filename='images/logo.svg') }}" alt="Cooeno Logo" width=35 height=35>
+          </a><!-- navbar-brand -->
+          <div class="navbar-right">
+          {% block searchButton %}{% endblock %}
+          <a class="nav-item btn btn-buy" href="{{ url_for('new_idea') }}" id="newButton"><i class="mr-1" data-feather="plus"></i>New</a>
+          {% if current_user.is_authenticated %}
+            <div class="dropdown dropdown-profile">
+              <a href="" class="dropdown-link" data-toggle="dropdown" data-display="static">
+                <div class="avatar avatar-sm"><img src="{{ image_file }}" class="rounded-circle" alt=""></div>
+              </a><!-- dropdown-link -->
+              <div class="dropdown-menu dropdown-menu-right tx-13">
+                <div class="avatar avatar-lg mg-b-15"><img src="{{ image_file }}" class="rounded-circle" alt=""></div>
+                <h6 class="tx-semibold mg-b-25">{{ current_user.username }}</h6>
+                <a href="{{ url_for('account') }}" class="dropdown-item"><i data-feather="edit-3"></i>Edit Profile</a>
+                <a href="{{ url_for('logout') }}" class="dropdown-item"><i data-feather="log-out"></i>Sign Out</a>
+              </div><!-- dropdown-menu -->
+            </div><!-- dropdown -->
+          {% else %}
+          <a class="nav-item btn btn-buy" href="{{ url_for('register') }}"><i class="mr-1" data-feather="star"></i>Register</a>
+          {% endif %}
+          </div><!-- navbar-right -->
+          <div class="navbar-search">
+            <div class="navbar-search-header">
+              <input type="search" class="form-control" placeholder="Type and hit enter to search...">
+              <button class="btn"><i data-feather="search"></i></button>
+              <a id="navbarSearchClose" href="" class="link-03 mg-l-5 mg-lg-l-10"><i data-feather="x"></i></a>
+            </div><!-- navbar-search-header -->
+            <div class="navbar-search-body">
+              <label class="tx-10 tx-medium tx-uppercase tx-spacing-1 tx-color-03 mg-b-10 d-flex align-items-center">Search by Department</label>
+              <ul class="list-unstyled">
+                {% for dept in depts %}
+                <li><a href="#">{{ dept.title }}</a></li>
+                {% endfor %}
+              </ul>
+
+              <hr class="mg-y-30 bd-0">
+
+              <label class="tx-10 tx-medium tx-uppercase tx-spacing-1 tx-color-03 mg-b-10 d-flex align-items-center">Search by Post Type</label>
+
+              <ul class="list-unstyled">
+                <li><a href="#"><i class="mr-2" data-feather="edit-2" width=15></i>Notion</a></li>
+                <li><a href="#"><i class="mr-2" data-feather="edit" width=15></i>Suggestion</a></li>
+                <li><a href="#"><i class="mr-2" data-feather="arrow-right-circle" width=15></i>Decision</a></li>
+                <li><a href="#"><i class="mr-2" data-feather="bar-chart-2" width=15></i>Poll</a></li>
+                <li><a href="#"><i class="mr-2" data-feather="heart" width=15></i>Feedback</a></li>
+              </ul>
+            </div><!-- navbar-search-body -->
+          </div><!-- navbar-search -->
+        </header><!-- navbar -->
+
+    {% block empty %}{% endblock %}
+    {% block hero %}{% endblock %}
+
+    <div class="content content-fixed">
+      <div class="container pd-x-0 pd-lg-x-10 pd-xl-x-0">
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div class="alert alert-dismissible alert-{{ category }}">
+                <button type="button" class="close" data-dismiss="alert">x</button>
+                {{ message }}
+              </div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+
+      </div><!-- container -->
+    </div><!-- content -->
+    {% block debate %}{% endblock %}
+
+    <footer class="footer">
+      <div>
+        <span>&copy; 2019 BeforeTheProduct </span>
+      </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='lib/jquery/jquery.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='lib/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='lib/feather-icons/feather.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='lib/perfect-scrollbar/perfect-scrollbar.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='lib/jquery.flot/jquery.flot.js') }}"></script>
+    <script src="{{ url_for('static', filename='lib/jquery.flot/jquery.flot.stack.js') }}"></script>
+    <script src="{{ url_for('static', filename='lib/jquery.flot/jquery.flot.resize.js') }}"></script>
+    <script src="{{ url_for('static', filename='lib/chart.js/Chart.bundle.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='lib/jqvmap/jquery.vmap.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='lib/jqvmap/maps/jquery.vmap.usa.js') }}"></script>
+
+    <script src="{{ url_for('static', filename='assets/js/dashforge.js') }}" ></script>
+
+    <script type="text/javascript">
+    $(function () {
+      $('[data-toggle="tooltip"]').tooltip()
+      })
+
+    $('.custom-file input').change(function (e) {
+        $(this).next('.custom-file-label').html(e.target.files[0].name);
+    });
+
+    </script>
+  </body>
+</html>

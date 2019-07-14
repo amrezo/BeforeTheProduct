@@ -1,0 +1,156 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="content-section">
+    <form method="POST" enctype="multipart/form-data">
+        {{ form.hidden_tag() }}
+        <fieldset class="form-group">
+            <legend class="border-bottom mb-4">Add New Idea</legend>
+            <div class="form-group">
+                {{ form.topic.label(class="form-control-label") }}
+                <i class="ml-1" data-feather="help-circle" width=17 data-toggle='tooltip' data-placement='right' title='What topic does your idea address?'></i>
+                {% if form.topic.errors %}
+                    {{ form.topic(class="form-control form-control-lg is-invalid") }}
+                    <div class="invalid-feedback">
+                        {% for error in form.topic.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    {{ form.topic(class="form-control form-control-lg") }}
+                {% endif %}
+            </div>
+            <div class="form-group">
+                {{ form.title.label(class="form-control-label") }}
+                <i class="ml-1" data-feather="help-circle" width=17 data-toggle='tooltip' data-placement='right' title='Please provide a meaningful title so that the topic of your idea is easily identifiable to others.'></i>
+                {% if form.title.errors %}
+                    {{ form.title(class="form-control form-control-lg is-invalid") }}
+                    <div class="invalid-feedback">
+                        {% for error in form.title.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    {{ form.title(class="form-control form-control-lg") }}
+                {% endif %}
+            </div>
+            <div class="form-group">
+                {{ form.link.label(class="form-control-label") }}
+                <i class="ml-1" data-feather="help-circle" width=17 data-toggle='tooltip' data-placement='right' title='Provide a relevant link if available (e.g. landing, signup page).'></i>
+                {% if form.link.errors %}
+                    {{ form.link(class="form-control form-control-lg is-invalid") }}
+                    <div class="invalid-feedback">
+                        {% for error in form.link.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    {{ form.link(class="form-control form-control-lg") }}
+                {% endif %}
+            </div>
+            <div class="form-group">
+                {{ form.description.label(class="form-control-label") }}
+                <i class="ml-1" data-feather="help-circle" width=17 data-toggle='tooltip' data-placement='right' title='Provide as much details as possible for your idea.'></i>
+                {% if form.description.errors %}
+                    {{ form.description(class="form-control form-control-lg is-invalid", id="hidden_field") }}
+                    <div id="quillInline" class="is-invalid">
+                    </div>
+                    <div class="invalid-feedback">
+                        {% for error in form.description.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    {{ form.description(class="form-control form-control-lg", id="hidden_field") }}
+                    <div id="quillInline">
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+              {{ form.thumbnail_image.label() }}
+              <i class="ml-1" data-feather="help-circle" width=17 data-toggle='tooltip' data-placement='right' title='Provide a square thumbnail image for your idea.'></i>
+              {% if thumbnail_image %}
+              <p><img class="rounded-circle mb-3" src="{{ thumbnail_image }}" width="100"></p>
+              {% endif %}
+              <div class="custom-file">
+                  {{ form.thumbnail_image(class="custom-file-input") }}
+                  <label class="custom-file-label" for="thumbnail_image">Choose thumbnail image</label>
+                  {% if form.thumbnail_image.errors %}
+                      {% for error in form.thumbnail_image.errors %}
+                          <span class="text-danger">{{ error }}</span><br />
+                      {% endfor %}
+                  {% endif %}
+              </div>
+            </div>
+            <div class="form-group">
+              {{ form.main_image.label() }}
+                <i class="ml-1" data-feather="help-circle" width=17 data-toggle='tooltip' data-placement='right' title='Provide the main image view for your idea.'></i>
+                {% if main_image %}
+                <p><img class="img-fluid" src="{{ main_image }}" width=300></p>
+                {% endif %}
+                <div class="custom-file">
+                  {{ form.main_image(class="custom-file-input") }}
+                  <label class="custom-file-label" for="main_image">Choose main image</label>
+                  {% if form.main_image.errors %}
+                      {% for error in form.main_image.errors %}
+                          <span class="text-danger">{{ error }}</span><br />
+                      {% endfor %}
+                  {% endif %}
+                </div>
+            </div>
+        </fieldset>
+        <div class="form-group">
+            {{ form.submit(class="btn btn-brand-01 btn-block") }}
+        </div>
+    </form>
+</div>
+
+<script src="{{ url_for('static', filename='lib/quill/quill.min.js') }}"></script>
+<script src="{{ url_for('static', filename='lib/jquery/jquery.min.js') }}"></script>
+<script src="{{ url_for('static', filename='lib/select2/js/select2.min.js') }}"></script>
+
+<script type="text/javascript">
+  var quill = new Quill('#quillInline', {
+    modules: {
+      toolbar: [
+        ['bold', 'italic', 'underline', 'link'],
+      ]
+    },
+    placeholder: 'Write something here...',
+    theme: 'snow'  // or 'bubble'
+  });
+
+  quill.getHTML = () => {
+    return quill.root.innerHTML;
+  };
+
+  quill.setHTML = (html) => {
+    quill.root.innerHTML = html;
+  };
+
+  {% if form_description %}
+    quill.setHTML('{{ form_description | safe }}');
+  {% endif %}
+
+  var submit = function () {
+
+    // Get the contents of the text editor
+    var hidden_text_field = document.getElementById('description');
+    hidden_text_field.value = quill.getHTML();
+
+  }
+
+  // Attach the onclick function to the submit button Flask-WTF creates
+  var form = document.getElementsByTagName('form')[0];
+  form.onsubmit = submit;
+
+
+  $('#topic').select2({
+    placeholder: 'Choose one topic',
+    searchInputPlaceholder: 'Search topics'
+  });
+
+
+</script>
+
+{% endblock content %}
